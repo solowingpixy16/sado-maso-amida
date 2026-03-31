@@ -99,7 +99,7 @@ function performStateTransition() {
             }
             break;
         case STATE_PLAYER_TRACING_AMIDA:
-            if (currentPlayerY >= HEIGHT_INSIDE_AMIDA) {
+            if (currentPlayerY >= HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA) {
                 console.log(`State transition occurred. From: ${currentState}`);
                 ++currentState;
                 frameCounterWithinState = 0;
