@@ -448,6 +448,7 @@ function onDown(event) {
 
 function onUp(event) {
     console.log("onUp(): " + String(event));
+    amidaCanvas.releasePointerCapture(event.pointerId);
     userPressing = false;
     if (currentState == STATE_USER_ADDING_HORIZONTAL_LINES) {
         let valid
@@ -498,7 +499,10 @@ function onMove(event) {
         "amida_triggering_button"
     ).addEventListener(
         "pointerdown",
-        (event) => { onAmidaTriggered(event); }
+        (event) => {
+            amidaCanvas.setPointerCapture(event.pointerId);
+            onAmidaTriggered(event);
+        }
     );
 }
 
