@@ -91,6 +91,7 @@ function performStateTransition() {
             }
             break;
         case STATE_USER_ADDING_HORIZONTAL_LINES:
+            amidaTriggered = false;
             if (currentPlayerY >= HEIGHT_ABOVE_AMIDA) {
                 console.log(`State transition occurred. From: ${currentState}`);
                 ++currentState;
@@ -99,6 +100,7 @@ function performStateTransition() {
             }
             break;
         case STATE_PLAYER_TRACING_AMIDA:
+            amidaTriggered = false;
             if (currentPlayerY >= HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA) {
                 console.log(`State transition occurred. From: ${currentState}`);
                 ++currentState;
@@ -107,6 +109,7 @@ function performStateTransition() {
             }
             break;
         case STATE_PLAYER_MOVING_TOWARDS_RESULT:
+            amidaTriggered = false;
             if (currentPlayerY >= HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA + EXTRA_VERTICAL_MOTION_HEIGHT) {
                 console.log(`State transition occurred. From: ${currentState}`);
                 ++currentState;
