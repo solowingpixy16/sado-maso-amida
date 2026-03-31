@@ -165,15 +165,7 @@ function calculateMotion() {
                 * (frameCounterWithinState / (REFRESH_RATE_FRAMES_PER_MILLIS * AMIDA_MODIFIABLE_PERIOD_MILLIS));
             break;
         case STATE_PLAYER_TRACING_AMIDA:
-            // T.B.D.
-            // currentPlayerX = ___;
-
-            if (frameCounterWithinState == 0) {
-                currentPlayerY = HEIGHT_ABOVE_AMIDA;
-                userPressing = false;
-            }
-            // elapsed_time = frames / refresh_rate
-            currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_FRAMES_PER_MILLIS);
+            traceAmida();
             break;
         case STATE_PLAYER_MOVING_TOWARDS_RESULT:
             currentPlayerX = LEFT_RIGHT_MARGIN + currentPlayerLine * DISTANCE_BETWEEN_VERTICAL_LINES;
@@ -195,6 +187,18 @@ function calculateMotion() {
             );
             break;
     }
+}
+
+function traceAmida() {
+    // T.B.D.
+    // currentPlayerX = ___;
+
+    if (frameCounterWithinState == 0) {
+        currentPlayerY = HEIGHT_ABOVE_AMIDA;
+        userPressing = false;
+    }
+    // elapsed_time = frames / refresh_rate
+    currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_FRAMES_PER_MILLIS);
 }
 
 function draw() {
