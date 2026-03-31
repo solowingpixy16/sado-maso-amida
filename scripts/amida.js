@@ -32,6 +32,8 @@ const VERTICAL_LINES_COUNT = 8;
 amidaCanvas.height = OVERALL_HEIGHT;
 amidaCanvas.width = OVERALL_WIDTH;
 
+const PLAYER_ABATOR_RADIUS = 10;
+
 const AMIDA_MODIFIABLE_PERIOD_MILLIS = 10_000;
 const TEASING_PERIOD_MILLIS = 5_000;
 const VERTICAL_MOTION_PIXEL_PER_MILLIS = 0.05;
@@ -143,12 +145,24 @@ function calculateMotion() {
 
 function draw() {
     amidaContext.clearRect(0, 0, OVERALL_WIDTH, OVERALL_HEIGHT);
+
+    // Draw vertical lines of amida.
     for (let i = 0; i < VERTICAL_LINES_COUNT; ++i) {
         let x = LEFT_RIGHT_MARGIN + i * WIDTH_INSIDE_AMIDA / (VERTICAL_LINES_COUNT - 1);
         amidaContext.beginPath();
         amidaContext.moveTo(x, HEIGHT_ABOVE_AMIDA);
         amidaContext.lineTo(x, HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA);
         amidaContext.stroke();
+        amidaContext.closePath();
+    }
+
+    // Draw player abator.
+    {
+        let x = LEFT_RIGHT_MARGIN + currentLine * WIDTH_INSIDE_AMIDA / (VERTICAL_LINES_COUNT - 1);
+        amidaContext.beginPath();
+        amidaContext.moveTo(x, currentPlayerY);
+        amidaContext.arc(x, currentPlayerY, PLAYER_ABATOR_RADIUS, 0, 2.0 * Math.PI, false);
+        amidaContext.fill();
         amidaContext.closePath();
     }
 }
