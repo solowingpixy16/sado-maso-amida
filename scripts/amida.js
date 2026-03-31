@@ -234,20 +234,22 @@ function traceAmida() {
             = departureY + (destinationY - departureY) * progress;
         if (departureLine < destinationLine) {
             if (currentPlayerX >= LEFT_RIGHT_MARGIN + destinationLine * DISTANCE_BETWEEN_VERTICAL_LINES) {
+                currentPlayerLine = destinationLine;
+                horizontalLines[nextCrossingArrayIndex][2] = false;
                 horizontallyMoving = false;
                 nextCrossingFound = false;
                 nextCrossingArrayIndex = 0;
                 whichEndIsDeparture = 0;
-                currentPlayerLine = destinationLine;
                 searchNextCrossing();
             }
         } else {
             if (currentPlayerX <= LEFT_RIGHT_MARGIN + destinationLine * DISTANCE_BETWEEN_VERTICAL_LINES) {
+                currentPlayerLine = destinationLine;
+                horizontalLines[nextCrossingArrayIndex][2] = false;
                 horizontallyMoving = false;
                 nextCrossingFound = false;
                 nextCrossingArrayIndex = 0;
                 whichEndIsDeparture = 0;
-                currentPlayerLine = destinationLine;
                 searchNextCrossing();
             }
         }
