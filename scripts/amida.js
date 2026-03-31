@@ -58,6 +58,9 @@ let currentPressedY = 0;
 // {{(vertical_line_no, y), (vertical_line_no, y), isActive}, {(vertical_line_no, y), (vertical_line_no, y), isActive}, ...}
 let horizontalLines = new Array();
 let horizontallyMoving = false;
+let nextCrossingFound = false;
+let nextCrossingArrayIndex = 0;
+let whichEndIsDeparture = 0;
 
 let amidaTriggered = false;
 
@@ -68,8 +71,6 @@ let amidaTriggered = false;
  */
 let currentPlayerLine = 0;
 let currentPlayerX = 0;
-let departureLineOfHorizontalMotion = 0;
-let destinationLineOfHorizontalMotion = 1;
 
 /**
  * @summary Player character's current y-axis position in amida.
@@ -79,8 +80,6 @@ let destinationLineOfHorizontalMotion = 1;
  *     The range of the value is [0, HEIGHT_INSIDE_AMIDA)
  */
 let currentPlayerY = 0;
-let departureYOfHorizontalMotion = 0;
-let destinationYOfHorizontalMotion = 0;
 
 
 function updateContents() {
@@ -193,16 +192,94 @@ function calculateMotion() {
 function traceAmida() {
     // T.B.D.
     // currentPlayerX = ___;
+    if (frameCounterWithinState == 0) {
+        currentPlayerY = HEIGHT_ABOVE_AMIDA;
+        userPressing = false;
+        nextCrossingFound = false;
+        nextCrossingArrayIndex = 0;
+        whichEndIsDeparture = 0;
+        searchNextCrossing();
+    }
 
     if (!horizontallyMoving) {
-        if (frameCounterWithinState == 0) {
-            currentPlayerY = HEIGHT_ABOVE_AMIDA;
-            userPressing = false;
-        }
+        currentPlayerX = LEFT_RIGHT_MARGIN + currentPlayerLine * DISTANCE_BETWEEN_VERTICAL_LINES;
         // elapsed_time = frames / refresh_rate
         currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_FRAMES_PER_MILLIS);
+
+        if (nextCrossingFound && currentPlayerY >= horizontalLines[nextCrossingArrayIndex][whichEndIsDeparture][1]) {
+            horizontallyMoving = true;
+        }
     } else {
+        let departureEnd = whichEndIsDeparture;
+        let destinationEnd;
+        if (departureEnd == 0) {
+            destinationEnd = 1;
+        } else {
+            destinationEnd = 0;
+        }
+        let departureLine = horizontalLines[nextCrossingArrayIndex][departureEnd][0];
+        let departureY = horizontalLines[nextCrossingArrayIndex][departureEnd][1];
+        let destinationLine = horizontalLines[nextCrossingArrayIndex][destinationEnd][0];
+        let destinationY = horizontalLines[nextCrossingArrayIndex][destinationEnd][1];
+        let progress = frameCounterWithinState / (REFRESH_RATE_FRAMES_PER_MILLIS * HORIZONTAL_MOTION_DURATION_MILLIS);
+        currentPlayerX
+            = LEFT_RIGHT_MARGIN
+            + departureLine * DISTANCE_BETWEEN_VERTICAL_LINES
+            + (destinationLine - departureLine)
+                * DISTANCE_BETWEEN_VERTICAL_LINES
+                * progress;
+        currentPlayerY
+            = HEIGHT_ABOVE_AMIDA
+            + departureY
+            + (destinationY - departureY)
+                * progress;
+        if (departureLine < destinationLine) {
+            if (currentPlayerX >= LEFT_RIGHT_MARGIN + destinationLine * DISTANCE_BETWEEN_VERTICAL_LINES) {
+                horizontallyMoving = false;
+                nextCrossingFound = false;
+                nextCrossingArrayIndex = 0;
+                whichEndIsDeparture = 0;
+                searchNextCrossing();
+            }
+        } else {
+            if (currentPlayerX <= LEFT_RIGHT_MARGIN + destinationLine * DISTANCE_BETWEEN_VERTICAL_LINES) {
+                horizontallyMoving = false;
+                nextCrossingFound = false;
+                nextCrossingArrayIndex = 0;
+                whichEndIsDeparture = 0;
+                searchNextCrossing();
+            }
+        }
     }
+}
+
+function searchNextCrossing () {
+    let found = false;
+    let candidateDepartureY = OVERALL_HEIGHT;
+    let candidateIndex = 0;
+    let whichEnd;
+    for (let i = 0; i < horizontalLines.length; ++i) {
+        if (horizontalLines[i][2] == true) {
+            if (horizontalLines[i][0][0] == currentPlayerLine && horizontalLines[i][0][1] > currentPlayerY) {
+                found = true;
+                if (horizontalLines[i][0][1] < candidateDepartureY) {
+                    candidateDepartureY = horizontalLines[i][0][1];
+                    candidateIndex = i;
+                    whichEnd = 0;
+                }
+            } else if (horizontalLines[i][1][0] == currentPlayerLine && horizontalLines[i][1][1] > currentPlayerY) {
+                found = true;
+                if (horizontalLines[i][1][1] < candidateDepartureY) {
+                    candidateDepartureY = horizontalLines[i][1][1];
+                    candidateIndex = i;
+                    whichEnd = 1;
+                }
+            }
+        }
+    }
+    nextCrossingFound = found;
+    nextCrossingArrayIndex = candidateIndex;
+    whichEndIsDeparture = whichEnd;
 }
 
 function draw() {
