@@ -67,6 +67,30 @@ let whichEndIsDeparture = 0;
 
 let amidaTriggered = false;
 
+// 完全に内輪ネタです。。。
+let matchers = [
+    /.*[Mm][^A-Za-z]*[Aa][^A-Za-z]*[Ii].*/,
+    /.*[Kk][^A-Za-z]*[Aa][^A-Za-z]*[Nn][^A-Za-z]*[Aa].*/,
+    /.*[Mm][^A-Za-z]*[Oo][^A-Za-z]*[Mm][^A-Za-z]*[Oo].*/,
+    /.*[Uu][^A-Za-z]*[Dd][^A-Za-z]*[Oo][^A-Za-z]*[Nn].*/,
+
+    /.*舞.*衣.*/,
+    // N/A
+    /.*桃.*/,
+    // N/A
+
+    /.*まい.*/,
+    /.*かな.*/,
+    /.*もも.*/,
+    /.*うどん.*/,
+
+    /.*マイ.*/,
+    /.*カナ.*/,
+    /.*モモ.*/,
+    /.*ウドン*/,
+];
+
+
 /**
  * @summary The line on which player character is placed.
  * @description
@@ -101,6 +125,7 @@ function performStateTransition() {
                 console.log(`State transition occurred. From: ${currentState}`);
                 ++currentState;
                 frameCounterWithinState = 0;
+                document.getElementById("user_name").disabled = true;
                 console.log(`State transition occurred. To: ${currentState}`);
             }
             break;
@@ -129,6 +154,7 @@ function performStateTransition() {
                 ++currentState;
                 frameCounterWithinState = 0;
                 console.log(`State transition occurred. To: ${currentState}`);
+                document.getElementById("user_name").disabled = false;
             }
             break;
         case STATE_SHOWING_RESULT:
@@ -138,6 +164,7 @@ function performStateTransition() {
                 currentState = STATE_USER_ADDING_HORIZONTAL_LINES;
                 frameCounterWithinState = 0;
                 horizontalLines.length = 0;
+                document.getElementById("user_name").disabled = true;
                 console.log(`State transition occurred. To: ${currentState}`);
             }
             break;
@@ -348,6 +375,15 @@ function draw() {
         let text;
         if (i == currentPlayerLine) {
             text = "M";
+            if (currentState == STATE_SHOWING_RESULT || currentState == STATE_PLAYER_MOVING_TOWARDS_RESULT ) {
+                for (let i = 0; i < matchers.length; ++i) {
+                    let userName = document.getElementById("user_name").value;
+                    // if (userName.match(matchers[i])) {
+                    if (matchers[i].test(userName)) {
+                        text = "超ドM";
+                    }
+                }
+            }
         } else {
             text = "S";
         }
