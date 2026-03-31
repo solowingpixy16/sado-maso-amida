@@ -57,6 +57,7 @@ let currentPressedY = 0;
 
 // {{(vertical_line_no, y), (vertical_line_no, y), isActive}, {(vertical_line_no, y), (vertical_line_no, y), isActive}, ...}
 let horizontalLines = new Array();
+let horizontallyMoving = false;
 
 let amidaTriggered = false;
 
@@ -193,12 +194,15 @@ function traceAmida() {
     // T.B.D.
     // currentPlayerX = ___;
 
-    if (frameCounterWithinState == 0) {
-        currentPlayerY = HEIGHT_ABOVE_AMIDA;
-        userPressing = false;
+    if (!horizontallyMoving) {
+        if (frameCounterWithinState == 0) {
+            currentPlayerY = HEIGHT_ABOVE_AMIDA;
+            userPressing = false;
+        }
+        // elapsed_time = frames / refresh_rate
+        currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_FRAMES_PER_MILLIS);
+    } else {
     }
-    // elapsed_time = frames / refresh_rate
-    currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_FRAMES_PER_MILLIS);
 }
 
 function draw() {
