@@ -26,6 +26,7 @@ const OVERALL_WIDTH = 500;
 const OVERALL_HEIGHT = HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA + HEIGHT_BELOW_AMIDA;
 const LEFT_RIGHT_MARGIN = 50;
 const WIDTH_INSIDE_AMIDA = OVERALL_WIDTH - 2 * LEFT_RIGHT_MARGIN;
+const EXTRA_VERTICAL_MOTION_HEIGHT = 250;
 
 const VERTICAL_LINES_COUNT = 8;
 
@@ -45,6 +46,7 @@ const STATE_PLAYER_TRACING_AMIDA         = 2;
 const STATE_PLAYER_MOVING_TOWARDS_RESULT = 3;
 const STATE_SHOWING_RESULT               = 4;
 let currentState = STATE_STANDBY;
+let frameCounterWithinState = 0;
 
 let amidaTriggered = false;
 
@@ -77,6 +79,7 @@ function updateContents() {
 }
 
 function performStateTransition() {
+    ++frameCounterWithinState;
     switch (currentState) {
         case STATE_STANDBY:
             if (amidaTriggered) {
@@ -85,12 +88,14 @@ function performStateTransition() {
                     () => {
                         console.log(`State transition occurred. From: ${currentState}`);
                         ++currentState;
+                        frameCounterWithinState = 0;
                         console.log(`State transition occurred. To: ${currentState}`);
                     },
                     AMIDA_MODIFIABLE_PERIOD_MILLIS
                 );
                 console.log(`State transition occurred. From: ${currentState}`);
                 ++currentState;
+                frameCounterWithinState = 0;
                 console.log(`State transition occurred. To: ${currentState}`);
             }
             break;
@@ -103,12 +108,14 @@ function performStateTransition() {
                     () => {
                         console.log(`State transition occurred. From: ${currentState}`);
                         ++currentState;
+                        frameCounterWithinState = 0;
                         console.log(`State transition occurred. To: ${currentState}`);
                     },
                     TEASING_PERIOD_MILLIS
                 );
                 console.log(`State transition occurred. From: ${currentState}`);
                 ++currentState;
+                frameCounterWithinState = 0;
                 console.log(`State transition occurred. To: ${currentState}`);
             }
             break;
@@ -122,17 +129,23 @@ function performStateTransition() {
                     () => {
                         console.log(`State transition occurred. From: ${currentState}`);
                         ++currentState;
+                        frameCounterWithinState = 0;
                         console.log(`State transition occurred. To: ${currentState}`);
                     },
                     AMIDA_MODIFIABLE_PERIOD_MILLIS
                 );
                 console.log(`State transition occurred. From: ${currentState}`);
                 currentState = STATE_USER_ADDING_HORIZONTAL_LINES;
+                frameCounterWithinState = 0;
                 console.log(`State transition occurred. To: ${currentState}`);
             }
             break;
         default:
-            console.log(`Oops! The 'currentState' value is out of range. currentState=${currentState}`);
+            console.log(
+                `performStateTransition():`
+                + ` Oops! The 'currentState' value is out of range.`
+                + ` currentState=${currentState}`
+            );
             break;
     }
 }
@@ -141,6 +154,42 @@ function handleTouchActions() {
 }
 
 function calculateMotion() {
+    switch (currentState) {
+        case STATE_USER_ADDING_HORIZONTAL_LINES:
+            // elapsed_time = frames / refresh_rate
+            // progress = elapsed_time / period
+            // Therefore:
+            // progress = (frames / refresh_rate) / period = frames / (refresh_rate * period)
+            currentPlayerY =
+                HEIGHT_ABOVE_AMIDA
+                * (frameCounterWithinState / (REFRESH_RATE_MILLIS * AMIDA_MODIFIABLE_PERIOD_MILLIS));
+            break;
+        case STATE_PLAYER_TRACING_AMIDA:
+            if (frameCounterWithinState == 0) {
+                currentPlayerY = HEIGHT_ABOVE_AMIDA;
+            }
+            // elapsed_time = frames / refresh_rate
+            currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_MILLIS);
+            break;
+        case STATE_PLAYER_MOVING_TOWARDS_RESULT:
+            // TEASING_PERIOD_MILLIS
+            currentPlayerY
+                = HEIGHT_ABOVE_AMIDA
+                + HEIGHT_INSIDE_AMIDA
+                + EXTRA_VERTICAL_MOTION_HEIGHT * (frameCounterWithinState / (REFRESH_RATE_MILLIS * TEASING_PERIOD_MILLIS));
+            break;
+        case STATE_STANDBY:
+        case STATE_SHOWING_RESULT:
+            // No motion generated here.
+            break;
+        default:
+            console.log(
+                `calculateMotion():`
+                + ` Oops! The 'currentState' value is out of range.`
+                + ` currentState=${currentState}`
+            );
+            break;
+    }
 }
 
 function draw() {
