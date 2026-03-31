@@ -167,6 +167,16 @@ function performStateTransition() {
                 document.getElementById("user_name").disabled = true;
                 console.log(`State transition occurred. To: ${currentState}`);
             }
+            let message = "ドMです！";
+            for (let i = 0; i < matchers.length; ++i) {
+                let userName = document.getElementById("user_name").value;
+                if (matchers[i].test(userName)) {
+                    message = "スーパーアルティメット超ドMです！";
+                }
+            }
+            document.getElementById("text_you_are").textContent = "あなたは...";
+            document.getElementById("text_masochist").textContent = message;
+
             break;
         default:
             console.log(
