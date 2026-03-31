@@ -214,11 +214,13 @@ function draw() {
     }
 
     if (currentState == STATE_USER_ADDING_HORIZONTAL_LINES) {
-        amidaContext.beginPath();
-        amidaContext.moveTo(pressedDownX, pressedDownY);
-        amidaContext.lineTo(currentPressedX, currentPressedY);
-        amidaContext.stroke();
-        amidaContext.closePath();
+        if (userPressing == true) {
+            amidaContext.beginPath();
+            amidaContext.moveTo(pressedDownX, pressedDownY);
+            amidaContext.lineTo(currentPressedX, currentPressedY);
+            amidaContext.stroke();
+            amidaContext.closePath();
+        }
     }
 
     for(let i = 0; i < horizontalLines.length; ++i) {
