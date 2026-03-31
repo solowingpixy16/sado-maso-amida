@@ -17,7 +17,7 @@
 const amidaCanvas = document.getElementById("amida_area");
 const amidaContext = amidaCanvas.getContext("2d");
 
-const REFRESH_RATE_FRAMES_PER_MILLIS = 10;
+const REFRESH_RATE_FRAMES_PER_MILLIS = 0.06;
 
 const HEIGHT_ABOVE_AMIDA = 500;
 const HEIGHT_INSIDE_AMIDA = 500;
