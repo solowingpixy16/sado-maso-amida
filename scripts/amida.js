@@ -290,6 +290,16 @@ function onUp(event) {
         if (valid) {
             let departureLine = Math.floor((pressedDownX - LEFT_RIGHT_MARGIN) / (DISTANCE_BETWEEN_VERTICAL_LINES) + 0.5);
             let destinationLine = Math.floor((event.offsetX - LEFT_RIGHT_MARGIN) / (DISTANCE_BETWEEN_VERTICAL_LINES) + 0.5);
+            if (departureLine < 0) {
+                departureLine = 0
+            } else if (departureLine > VERTICAL_LINES_COUNT - 1) {
+                departureLine = VERTICAL_LINES_COUNT - 1;
+            }
+            if (destinationLine < 0) {
+                destinationLine = 0;
+            } else if (destinationLine > VERTICAL_LINES_COUNT - 1) {
+                destinationLine = VERTICAL_LINES_COUNT - 1;
+            }
             horizontalLines.push(new Array([departureLine, pressedDownY], [destinationLine, event.offsetY], true));
         }
     }
