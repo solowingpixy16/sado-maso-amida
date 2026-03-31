@@ -53,7 +53,7 @@ let amidaTriggered = false;
  * @description
  *     The range of the value is [0, VERTICAL_LINES_COUNT)
  */
-let currentLine = 0;
+let currentPlayerLine = 0;
 let departureLineOfHorizontalMotion = 0;
 let destinationLineOfHorizontalMotion = 1;
 
@@ -158,7 +158,7 @@ function draw() {
 
     // Draw player abator.
     {
-        let x = LEFT_RIGHT_MARGIN + currentLine * WIDTH_INSIDE_AMIDA / (VERTICAL_LINES_COUNT - 1);
+        let x = LEFT_RIGHT_MARGIN + currentPlayerLine * WIDTH_INSIDE_AMIDA / (VERTICAL_LINES_COUNT - 1);
         amidaContext.beginPath();
         amidaContext.moveTo(x, currentPlayerY);
         amidaContext.arc(x, currentPlayerY, PLAYER_ABATOR_RADIUS, 0, 2.0 * Math.PI, false);
