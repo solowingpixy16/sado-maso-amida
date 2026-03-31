@@ -17,7 +17,7 @@
 const amidaCanvas = document.getElementById("amida_area");
 const amidaContext = amidaCanvas.getContext("2d");
 
-const REFRESH_RATE_MILLIS = 10;
+const REFRESH_RATE_FRAMES_PER_MILLIS = 10;
 
 const HEIGHT_ABOVE_AMIDA = 500;
 const HEIGHT_INSIDE_AMIDA = 500;
@@ -145,21 +145,21 @@ function calculateMotion() {
             // progress = (frames / refresh_rate) / period = frames / (refresh_rate * period)
             currentPlayerY =
                 HEIGHT_ABOVE_AMIDA
-                * (frameCounterWithinState / (REFRESH_RATE_MILLIS * AMIDA_MODIFIABLE_PERIOD_MILLIS));
+                * (frameCounterWithinState / (REFRESH_RATE_FRAMES_PER_MILLIS * AMIDA_MODIFIABLE_PERIOD_MILLIS));
             break;
         case STATE_PLAYER_TRACING_AMIDA:
             if (frameCounterWithinState == 0) {
                 currentPlayerY = HEIGHT_ABOVE_AMIDA;
             }
             // elapsed_time = frames / refresh_rate
-            currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_MILLIS);
+            currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_FRAMES_PER_MILLIS);
             break;
         case STATE_PLAYER_MOVING_TOWARDS_RESULT:
             // TEASING_PERIOD_MILLIS
             currentPlayerY
                 = HEIGHT_ABOVE_AMIDA
                 + HEIGHT_INSIDE_AMIDA
-                + EXTRA_VERTICAL_MOTION_HEIGHT * (frameCounterWithinState / (REFRESH_RATE_MILLIS * TEASING_PERIOD_MILLIS));
+                + EXTRA_VERTICAL_MOTION_HEIGHT * (frameCounterWithinState / (REFRESH_RATE_FRAMES_PER_MILLIS * TEASING_PERIOD_MILLIS));
             break;
         case STATE_STANDBY:
         case STATE_SHOWING_RESULT:
@@ -199,7 +199,7 @@ function draw() {
     }
 }
 
-setInterval(updateContents, REFRESH_RATE_MILLIS);
+setInterval(updateContents, 1 / REFRESH_RATE_FRAMES_PER_MILLIS);
 
 document.getElementById(
     "amida_triggering_button"
