@@ -295,9 +295,11 @@ function onUp(event) {
             && event.offsetX < OVERALL_WIDTH
             && event.offsetY > HEIGHT_ABOVE_AMIDA
             && event.offsetY < HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA;
+        let departureLine;
+        let destinationLine;
         if (valid) {
-            let departureLine = Math.floor((pressedDownX - LEFT_RIGHT_MARGIN) / (DISTANCE_BETWEEN_VERTICAL_LINES) + 0.5);
-            let destinationLine = Math.floor((event.offsetX - LEFT_RIGHT_MARGIN) / (DISTANCE_BETWEEN_VERTICAL_LINES) + 0.5);
+            departureLine = Math.floor((pressedDownX - LEFT_RIGHT_MARGIN) / (DISTANCE_BETWEEN_VERTICAL_LINES) + 0.5);
+            destinationLine = Math.floor((event.offsetX - LEFT_RIGHT_MARGIN) / (DISTANCE_BETWEEN_VERTICAL_LINES) + 0.5);
             if (departureLine < 0) {
                 departureLine = 0
             } else if (departureLine > VERTICAL_LINES_COUNT - 1) {
@@ -308,6 +310,11 @@ function onUp(event) {
             } else if (destinationLine > VERTICAL_LINES_COUNT - 1) {
                 destinationLine = VERTICAL_LINES_COUNT - 1;
             }
+            if (departureLine == destinationLine) {
+                valid = false;
+            }
+        }
+        if (valid) {
             horizontalLines.push(new Array([departureLine, pressedDownY], [destinationLine, event.offsetY], true));
         }
     }
