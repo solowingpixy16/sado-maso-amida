@@ -48,6 +48,7 @@ const STATE_PLAYER_MOVING_TOWARDS_RESULT = 3;
 const STATE_SHOWING_RESULT               = 4;
 let currentState = STATE_STANDBY;
 let frameCounterWithinState = 0;
+let frameCounterWithinHorizontalMotion = 0;
 
 let userPressing = false;
 let pressedDownX = 0;
@@ -190,9 +191,9 @@ function calculateMotion() {
 }
 
 function traceAmida() {
-    // T.B.D.
-    // currentPlayerX = ___;
+    ++frameCounterWithinHorizontalMotion;
     if (frameCounterWithinState == 0) {
+        frameCounterWithinHorizontalMotion = 0;
         currentPlayerY = HEIGHT_ABOVE_AMIDA;
         userPressing = false;
         nextCrossingFound = false;
@@ -204,10 +205,11 @@ function traceAmida() {
     if (!horizontallyMoving) {
         currentPlayerX = LEFT_RIGHT_MARGIN + currentPlayerLine * DISTANCE_BETWEEN_VERTICAL_LINES;
         // elapsed_time = frames / refresh_rate
-        currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_FRAMES_PER_MILLIS);
+        currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinHorizontalMotion / REFRESH_RATE_FRAMES_PER_MILLIS);
 
         if (nextCrossingFound && currentPlayerY >= horizontalLines[nextCrossingArrayIndex][whichEndIsDeparture][1]) {
             horizontallyMoving = true;
+            frameCounterWithinHorizontalMotion = 0;
         }
     } else {
         let departureEnd = whichEndIsDeparture;
@@ -221,7 +223,7 @@ function traceAmida() {
         let departureY = horizontalLines[nextCrossingArrayIndex][departureEnd][1];
         let destinationLine = horizontalLines[nextCrossingArrayIndex][destinationEnd][0];
         let destinationY = horizontalLines[nextCrossingArrayIndex][destinationEnd][1];
-        let progress = frameCounterWithinState / (REFRESH_RATE_FRAMES_PER_MILLIS * HORIZONTAL_MOTION_DURATION_MILLIS);
+        let progress = frameCounterWithinHorizontalMotion / (REFRESH_RATE_FRAMES_PER_MILLIS * HORIZONTAL_MOTION_DURATION_MILLIS);
         currentPlayerX
             = LEFT_RIGHT_MARGIN
             + departureLine * DISTANCE_BETWEEN_VERTICAL_LINES
@@ -229,16 +231,14 @@ function traceAmida() {
                 * DISTANCE_BETWEEN_VERTICAL_LINES
                 * progress;
         currentPlayerY
-            = HEIGHT_ABOVE_AMIDA
-            + departureY
-            + (destinationY - departureY)
-                * progress;
+            = departureY + (destinationY - departureY) * progress;
         if (departureLine < destinationLine) {
             if (currentPlayerX >= LEFT_RIGHT_MARGIN + destinationLine * DISTANCE_BETWEEN_VERTICAL_LINES) {
                 horizontallyMoving = false;
                 nextCrossingFound = false;
                 nextCrossingArrayIndex = 0;
                 whichEndIsDeparture = 0;
+                currentPlayerLine = destinationLine;
                 searchNextCrossing();
             }
         } else {
@@ -247,6 +247,7 @@ function traceAmida() {
                 nextCrossingFound = false;
                 nextCrossingArrayIndex = 0;
                 whichEndIsDeparture = 0;
+                currentPlayerLine = destinationLine;
                 searchNextCrossing();
             }
         }
@@ -280,6 +281,16 @@ function searchNextCrossing () {
     nextCrossingFound = found;
     nextCrossingArrayIndex = candidateIndex;
     whichEndIsDeparture = whichEnd;
+    if (found) {
+        console.log(
+            "found:"
+            + ` nextCrossingFound=${nextCrossingFound}`
+            + ` nextCrossingArrayIndex=${nextCrossingArrayIndex}`
+            + ` whichEndIsDeparture=${whichEndIsDeparture}`
+            + ` horizontalLines[nextCrossingArrayIndex]={{(${horizontalLines[nextCrossingArrayIndex][0][0]},${horizontalLines[nextCrossingArrayIndex][0][1]})}, {(${horizontalLines[nextCrossingArrayIndex][1][0]},${horizontalLines[nextCrossingArrayIndex][1][1]})},${horizontalLines[nextCrossingArrayIndex][2]}}`
+            
+        );
+    }
 }
 
 function draw() {
