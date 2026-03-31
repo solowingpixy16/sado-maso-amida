@@ -29,6 +29,7 @@ const WIDTH_INSIDE_AMIDA = OVERALL_WIDTH - 2 * LEFT_RIGHT_MARGIN;
 const EXTRA_VERTICAL_MOTION_HEIGHT = 250;
 
 const VERTICAL_LINES_COUNT = 8;
+const DISTANCE_BETWEEN_VERTICAL_LINES = WIDTH_INSIDE_AMIDA / (VERTICAL_LINES_COUNT - 1);
 
 amidaCanvas.height = OVERALL_HEIGHT;
 amidaCanvas.width = OVERALL_WIDTH;
@@ -47,6 +48,15 @@ const STATE_PLAYER_MOVING_TOWARDS_RESULT = 3;
 const STATE_SHOWING_RESULT               = 4;
 let currentState = STATE_STANDBY;
 let frameCounterWithinState = 0;
+
+let userPressing = false;
+let pressedDownX = 0;
+let pressedDownY = 0;
+let currentPressedX = 0;
+let currentPressedY = 0;
+
+// {{(vertical_line_no, y), (vertical_line_no, y), isActive}, {(vertical_line_no, y), (vertical_line_no, y), isActive}, ...}
+let horizontalLines = new Array();
 
 let amidaTriggered = false;
 
@@ -123,6 +133,7 @@ function performStateTransition() {
                 console.log(`State transition occurred. From: ${currentState}`);
                 currentState = STATE_USER_ADDING_HORIZONTAL_LINES;
                 frameCounterWithinState = 0;
+                horizontalLines.length = 0;
                 console.log(`State transition occurred. To: ${currentState}`);
             }
             break;
@@ -153,6 +164,7 @@ function calculateMotion() {
         case STATE_PLAYER_TRACING_AMIDA:
             if (frameCounterWithinState == 0) {
                 currentPlayerY = HEIGHT_ABOVE_AMIDA;
+                userPressing = false;
             }
             // elapsed_time = frames / refresh_rate
             currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_FRAMES_PER_MILLIS);
@@ -183,7 +195,7 @@ function draw() {
 
     // Draw vertical lines of amida.
     for (let i = 0; i < VERTICAL_LINES_COUNT; ++i) {
-        let x = LEFT_RIGHT_MARGIN + i * WIDTH_INSIDE_AMIDA / (VERTICAL_LINES_COUNT - 1);
+        let x = LEFT_RIGHT_MARGIN + i * DISTANCE_BETWEEN_VERTICAL_LINES;
         amidaContext.beginPath();
         amidaContext.moveTo(x, HEIGHT_ABOVE_AMIDA);
         amidaContext.lineTo(x, HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA);
@@ -193,16 +205,37 @@ function draw() {
 
     // Draw player abator.
     {
-        let x = LEFT_RIGHT_MARGIN + currentPlayerLine * WIDTH_INSIDE_AMIDA / (VERTICAL_LINES_COUNT - 1);
+        let x = LEFT_RIGHT_MARGIN + currentPlayerLine * DISTANCE_BETWEEN_VERTICAL_LINES;
         amidaContext.beginPath();
         amidaContext.moveTo(x, currentPlayerY);
         amidaContext.arc(x, currentPlayerY, PLAYER_ABATOR_RADIUS, 0, 2.0 * Math.PI, false);
         amidaContext.fill();
         amidaContext.closePath();
     }
+
+    if (currentState == STATE_USER_ADDING_HORIZONTAL_LINES) {
+        amidaContext.beginPath();
+        amidaContext.moveTo(pressedDownX, pressedDownY);
+        amidaContext.lineTo(currentPressedX, currentPressedY);
+        amidaContext.stroke();
+        amidaContext.closePath();
+    }
+
+    for(let i = 0; i < horizontalLines.length; ++i) {
+        let departureX = LEFT_RIGHT_MARGIN + DISTANCE_BETWEEN_VERTICAL_LINES * horizontalLines[i][0][0];
+        let departureY = horizontalLines[i][0][1];
+        let destinationX = LEFT_RIGHT_MARGIN + DISTANCE_BETWEEN_VERTICAL_LINES * horizontalLines[i][1][0];
+        let destinationY = horizontalLines[i][1][1];
+        amidaContext.beginPath();
+        amidaContext.moveTo(departureX, departureY);
+        amidaContext.lineTo(destinationX, destinationY);
+        amidaContext.stroke();
+        amidaContext.closePath();
+    }
 }
 
 setInterval(updateContents, 1 / REFRESH_RATE_FRAMES_PER_MILLIS);
+
 
 document.getElementById(
     "amida_triggering_button"
@@ -210,6 +243,67 @@ document.getElementById(
     "click",
     (event) => { onAmidaTriggered(event); }
 );
+
+amidaCanvas.addEventListener(
+    "pointerdown",
+    (event) => { onDown(event); }
+);
+
+amidaCanvas.addEventListener(
+    "pointerup",
+    (event) => { onUp(event); }
+);
+
+amidaCanvas.addEventListener(
+    "pointermove",
+    (event) => { onMove(event); }
+);
+
+function onDown(event) {
+    console.log("onDown(): " + String(event));
+    userPressing = true;
+    pressedDownX = event.offsetX;
+    pressedDownY = event.offsetY;
+}
+
+function onUp(event) {
+    console.log("onUp(): " + String(event));
+    userPressing = false;
+    if (currentState == STATE_USER_ADDING_HORIZONTAL_LINES) {
+        let valid
+            = pressedDownX > 0
+            && pressedDownX < OVERALL_WIDTH
+            && pressedDownY > HEIGHT_ABOVE_AMIDA
+            && pressedDownY < HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA
+            && event.offsetX > 0
+            && event.offsetX < OVERALL_WIDTH
+            && event.offsetY > HEIGHT_ABOVE_AMIDA
+            && event.offsetY < HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA;
+        if (valid) {
+            let departureLine = Math.floor((pressedDownX - LEFT_RIGHT_MARGIN) / (DISTANCE_BETWEEN_VERTICAL_LINES) + 0.5);
+            let destinationLine = Math.floor((event.offsetX - LEFT_RIGHT_MARGIN) / (DISTANCE_BETWEEN_VERTICAL_LINES) + 0.5);
+            horizontalLines.push(new Array([departureLine, pressedDownY], [destinationLine, event.offsetY], true));
+        }
+    }
+}
+
+function onMove(event) {
+    if (userPressing) {
+        console.log("onMove(): " + String(event));
+        currentPressedX = event.offsetX;
+        currentPressedY = event.offsetY;
+    }
+}
+
+{
+
+    document.getElementById(
+        "amida_triggering_button"
+    ).addEventListener(
+        "pointerdown",
+        (event) => { onAmidaTriggered(event); }
+    );
+}
 
 function onAmidaTriggered(event) {
     console.log(`>>> onAmidaTriggered(${event})`);
