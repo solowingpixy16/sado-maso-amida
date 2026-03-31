@@ -66,6 +66,7 @@ let amidaTriggered = false;
  *     The range of the value is [0, VERTICAL_LINES_COUNT)
  */
 let currentPlayerLine = 0;
+let currentPlayerX = 0;
 let departureLineOfHorizontalMotion = 0;
 let destinationLineOfHorizontalMotion = 1;
 
@@ -153,6 +154,8 @@ function handleTouchActions() {
 function calculateMotion() {
     switch (currentState) {
         case STATE_USER_ADDING_HORIZONTAL_LINES:
+            currentPlayerX = LEFT_RIGHT_MARGIN + currentPlayerLine * DISTANCE_BETWEEN_VERTICAL_LINES;
+
             // elapsed_time = frames / refresh_rate
             // progress = elapsed_time / period
             // Therefore:
@@ -162,6 +165,9 @@ function calculateMotion() {
                 * (frameCounterWithinState / (REFRESH_RATE_FRAMES_PER_MILLIS * AMIDA_MODIFIABLE_PERIOD_MILLIS));
             break;
         case STATE_PLAYER_TRACING_AMIDA:
+            // T.B.D.
+            // currentPlayerX = ___;
+
             if (frameCounterWithinState == 0) {
                 currentPlayerY = HEIGHT_ABOVE_AMIDA;
                 userPressing = false;
@@ -170,7 +176,8 @@ function calculateMotion() {
             currentPlayerY += VERTICAL_MOTION_PIXEL_PER_MILLIS * (frameCounterWithinState / REFRESH_RATE_FRAMES_PER_MILLIS);
             break;
         case STATE_PLAYER_MOVING_TOWARDS_RESULT:
-            // TEASING_PERIOD_MILLIS
+            currentPlayerX = LEFT_RIGHT_MARGIN + currentPlayerLine * DISTANCE_BETWEEN_VERTICAL_LINES;
+
             currentPlayerY
                 = HEIGHT_ABOVE_AMIDA
                 + HEIGHT_INSIDE_AMIDA
@@ -205,10 +212,9 @@ function draw() {
 
     // Draw player abator.
     {
-        let x = LEFT_RIGHT_MARGIN + currentPlayerLine * DISTANCE_BETWEEN_VERTICAL_LINES;
         amidaContext.beginPath();
-        amidaContext.moveTo(x, currentPlayerY);
-        amidaContext.arc(x, currentPlayerY, PLAYER_ABATOR_RADIUS, 0, 2.0 * Math.PI, false);
+        amidaContext.moveTo(currentPlayerX, currentPlayerY);
+        amidaContext.arc(currentPlayerX, currentPlayerY, PLAYER_ABATOR_RADIUS, 0, 2.0 * Math.PI, false);
         amidaContext.fill();
         amidaContext.closePath();
     }
