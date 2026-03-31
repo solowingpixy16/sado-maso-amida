@@ -354,6 +354,18 @@ function draw() {
         amidaContext.font = "20px Arial";
         amidaContext.fillText(text, x, y);
     }
+
+    switch (currentState) {
+        case STATE_USER_ADDING_HORIZONTAL_LINES:
+        case STATE_PLAYER_TRACING_AMIDA:
+            amidaContext.fillRect(0, HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA, OVERALL_WIDTH, HEIGHT_BELOW_AMIDA);
+            break;
+        case STATE_STANDBY:
+        case STATE_PLAYER_MOVING_TOWARDS_RESULT:
+        case STATE_SHOWING_RESULT:
+        default:
+            break;
+    }
 }
 
 setInterval(updateContents, 1 / REFRESH_RATE_FRAMES_PER_MILLIS);
