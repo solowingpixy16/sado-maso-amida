@@ -27,6 +27,8 @@ const OVERALL_HEIGHT = HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA + HEIGHT_BELOW_A
 const LEFT_RIGHT_MARGIN = 50;
 const WIDTH_INSIDE_AMIDA = OVERALL_WIDTH - 2 * LEFT_RIGHT_MARGIN;
 const EXTRA_VERTICAL_MOTION_HEIGHT = 250;
+const TEXT_VERTICAL_OFFSET = 50;
+const TEXT_HORIZONTAL_OFFSET = -4;
 
 const VERTICAL_LINES_COUNT = 8;
 const DISTANCE_BETWEEN_VERTICAL_LINES = WIDTH_INSIDE_AMIDA / (VERTICAL_LINES_COUNT - 1);
@@ -337,6 +339,20 @@ function draw() {
         amidaContext.lineTo(destinationX, destinationY);
         amidaContext.stroke();
         amidaContext.closePath();
+    }
+
+    // Draw "sado" or "maso" text on canvas.
+    for (let i = 0; i < VERTICAL_LINES_COUNT; ++i) {
+        let x = LEFT_RIGHT_MARGIN + i * DISTANCE_BETWEEN_VERTICAL_LINES + TEXT_HORIZONTAL_OFFSET;
+        let y = HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA + EXTRA_VERTICAL_MOTION_HEIGHT + TEXT_VERTICAL_OFFSET;
+        let text;
+        if (i == currentPlayerLine) {
+            text = "M";
+        } else {
+            text = "S";
+        }
+        amidaContext.font = "20px Arial";
+        amidaContext.fillText(text, x, y);
     }
 }
 
