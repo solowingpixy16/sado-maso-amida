@@ -84,15 +84,6 @@ function performStateTransition() {
         case STATE_STANDBY:
             if (amidaTriggered) {
                 amidaTriggered = false;
-                setTimeout(
-                    () => {
-                        console.log(`State transition occurred. From: ${currentState}`);
-                        ++currentState;
-                        frameCounterWithinState = 0;
-                        console.log(`State transition occurred. To: ${currentState}`);
-                    },
-                    AMIDA_MODIFIABLE_PERIOD_MILLIS
-                );
                 console.log(`State transition occurred. From: ${currentState}`);
                 ++currentState;
                 frameCounterWithinState = 0;
@@ -100,19 +91,15 @@ function performStateTransition() {
             }
             break;
         case STATE_USER_ADDING_HORIZONTAL_LINES:
-            // The transition is configured in "case STATE_STANDBY" or "case STATE_SHOWING_RESULT" block.
+            if (currentPlayerY >= HEIGHT_ABOVE_AMIDA) {
+                console.log(`State transition occurred. From: ${currentState}`);
+                ++currentState;
+                frameCounterWithinState = 0;
+                console.log(`State transition occurred. To: ${currentState}`);
+            }
             break;
         case STATE_PLAYER_TRACING_AMIDA:
             if (currentPlayerY >= HEIGHT_INSIDE_AMIDA) {
-                setTimeout(
-                    () => {
-                        console.log(`State transition occurred. From: ${currentState}`);
-                        ++currentState;
-                        frameCounterWithinState = 0;
-                        console.log(`State transition occurred. To: ${currentState}`);
-                    },
-                    TEASING_PERIOD_MILLIS
-                );
                 console.log(`State transition occurred. From: ${currentState}`);
                 ++currentState;
                 frameCounterWithinState = 0;
@@ -120,20 +107,16 @@ function performStateTransition() {
             }
             break;
         case STATE_PLAYER_MOVING_TOWARDS_RESULT:
-            // The transition is configured in "case STATE_PLAYER_TRACING_AMIDA" block.
+            if (currentPlayerY >= HEIGHT_ABOVE_AMIDA + HEIGHT_INSIDE_AMIDA + EXTRA_VERTICAL_MOTION_HEIGHT) {
+                console.log(`State transition occurred. From: ${currentState}`);
+                ++currentState;
+                frameCounterWithinState = 0;
+                console.log(`State transition occurred. To: ${currentState}`);
+            }
             break;
         case STATE_SHOWING_RESULT:
             if (amidaTriggered) {
                 amidaTriggered = false;
-                setTimeout(
-                    () => {
-                        console.log(`State transition occurred. From: ${currentState}`);
-                        ++currentState;
-                        frameCounterWithinState = 0;
-                        console.log(`State transition occurred. To: ${currentState}`);
-                    },
-                    AMIDA_MODIFIABLE_PERIOD_MILLIS
-                );
                 console.log(`State transition occurred. From: ${currentState}`);
                 currentState = STATE_USER_ADDING_HORIZONTAL_LINES;
                 frameCounterWithinState = 0;
