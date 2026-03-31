@@ -14,5 +14,26 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<html>
+<html lang="ja-JP">
+    <head>
+        <meta charset="utf-8" />
+        <title> サド/マゾ診断あみだくじ by pick-chan</title>
+        <style>
+            canvas {
+                background: gray;
+                display: block;
+                margin: 0 auto;
+            }
+        </style>
+    </head>
+    <body>
+        <p id="countdown_indicator">_</p>
+        <canvas id="amida_area"></canvas>
+        <p id="text_you_are">_</p>
+        <p id="text_masochist">_</p>
+        <input id="user_name" type="text" placeholder="あなたのハンドルネーム (例: pixy)">
+        <button id="amida_triggering_button" type="button">Start</button>
+        <p> "サド/マゾ診断あみだくじ" by pick-chan is licensed under the Apache License, Version 2.0 </p>
+        <script src="./scripts/amida.js"></script>
+    </body>
 </html>
