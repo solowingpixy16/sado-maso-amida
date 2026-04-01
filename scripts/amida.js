@@ -436,8 +436,27 @@ amidaCanvas.addEventListener(
 
 amidaCanvas.addEventListener(
     "pointermove",
-    (event) => { onMove(event); }
+    (event) => {
+        event.preventDefault();
+        onMove(event);
+    }
 );
+
+amidaCanvas.addEventListener(
+    "touchstart",
+    (event) => { event.preventDefault(); }
+)
+
+
+amidaCanvas.addEventListener(
+    "touchend",
+    (event) => { event.preventDefault(); }
+)
+
+amidaCanvas.addEventListener(
+    "touchcancel",
+    (event) => { event.preventDefault(); }
+)
 
 function onDown(event) {
     console.log("onDown(): " + String(event));
